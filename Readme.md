@@ -1,16 +1,15 @@
 SUPER SEO LANGUAGE URLS
 =====================
 
-Opencart SUPER SEO LANGUAGE URLS Opencart 2.x.
+Opencart SUPER SEO LANGUAGE URLS Opencart 3.x.
 
 
 Author
 -------
 Jason Clark(mithereal@gmail.com)
 Original Author: Orestis Dimou
-Ported to 2.x by Mithereal
+Ported to 3.x by Mithereal
 
-Music Coded to: Whitechapel
 
 Installation instructions For SUPER SEO LANGUAGE URLS
 -------------------------------------------------
@@ -30,7 +29,7 @@ Installation:
 
 Additional notes: 
 
-1.  If you are using other languages than English, you should copy the file "admin/language/english/module/super_seo.php " to your other language directories in admin/languages/
+1.  If you are using other languages than English, you should copy the file "admin/language/english/extension/module/super_seo.php " to your other language directories in admin/languages/
 
 2. Place .htaccess file in root of your opencart installation folder (htaccess.txt in extra folder), if you don't have one. This .htaccess is also used from opencart to treat url in a 
 GET[_route_] parameter, for its SEO urls. During opencart installation you 

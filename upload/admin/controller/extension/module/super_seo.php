@@ -4,26 +4,14 @@ class ControllerModuleSuperSeo extends Controller {
 	
 	public function index() {
 		$data = array();
+
         $data = array_merge($data, $this->load->language('module/super_seo'));
 
 		$this->document->setTitle($this->language->get('sseo_heading_title'));
-		$this->load->model('setting/setting');
-		
-		if (isset($this->session->data['success'])) {
-			$data['success'] = $this->session->data['success'];
-		
-			unset($this->session->data['success']);
-		} else {
-			$data['success'] = '';
-		}
 
-		if (isset($this->session->data['error'])) {
-			$data['error'] = $this->session->data['error'];
-		
-			unset($this->session->data['error']);
-		} else {
-			$data['error'] = '';
-		}
+		$this->load->model('setting/setting');
+
+
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
@@ -34,30 +22,28 @@ class ControllerModuleSuperSeo extends Controller {
 
 		$data['breadcrumbs'][] = array(
 				'text'      => $this->language->get('text_home'),
-		'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
+		'href'      => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], 'SSL'),
 				'separator' => false
 		);
 
 		$data['breadcrumbs'][] = array(
-				'text'      => $this->language->get('text_module'),
-		'href'      => $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'),
-				'separator' => ' :: '
+				'text'      => $this->language->get('text_extension'),
+		'href'      => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module')
 		);
 	
 		$data['breadcrumbs'][] = array(
 				'text'      => $this->language->get('sseo_heading_title'),
-		'href'      => $this->url->link('module/ultimate_seo', 'token=' . $this->session->data['token'], 'SSL'),
-				'separator' => ' :: '
+		'href'      => $this->url->link('extension/module/ultimate_seo', 'user_token=' . $this->session->data['user_token'])
 		);
 
 		$data['button_save'] = $this->language->get('sseo_save');
 		$data['button_cancel'] = $this->language->get('sseo_cancel');
 		$data['button_delete'] = $this->language->get('sseo_delete');
 
-		$data['codeinspires_url'] = $this->url->link('module/super_seo/support_page', 'token=' . $this->session->data['token'], 'SSL');
+		$data['codeinspires_url'] = $this->url->link('extension/module/super_seo/support_page', 'user_token=' . $this->session->data['user_token'], 'SSL');
 		$data['codeinspires'] = $this->config->get('codeinspires');
 
-		/*if (isset($this->request->post['useo_meta_num'])) {
+		if (isset($this->request->post['useo_meta_num'])) {
 			$data['useo_meta_num'] = $this->request->post['useo_meta_num'];
 		} else {
 			$data['useo_meta_num'] = $this->config->get('useo_meta_num');
@@ -70,20 +56,16 @@ class ControllerModuleSuperSeo extends Controller {
 		}
 		if ($data['useo_auto_meta'] == 'yes') $data['useo_auto_meta'] = 'checked';
 		else $data['useo_auto_meta'] = '';
-*/
-		$data['action'] = $this->url->link('module/super_seo', 'token=' . $this->session->data['token'], 'SSL');
+
+		$data['action'] = $this->url->link('extension/module/super_seo', 'user_token=' . $this->session->data['user_token'], 'SSL');
 		
 		$data['description'] = $this->language->get('sseo_description');
 		$data['description_route'] = $this->language->get('sseo_description_route');
 		$data['description_url'] = $this->language->get('sseo_description_url');
-		$data['cancel'] = $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');
+
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'], 'SSL');
 		$data['heading_title'] = $this->language->get('sseo_heading_title');
-		/*
-		$data['entry_meta_num'] = $this->language->get('useo_entry_meta_num');
-		$data['entry_meta_num_description'] = $this->language->get('useo_entry_meta_num_description');
-		$data['entry_auto_meta'] = $this->language->get('useo_entry_auto_meta');
-		$data['entry_auto_meta_description'] = $this->language->get('useo_entry_auto_meta_description');
-*/
+
 		$data['modules'] = array();
 		
 		if (isset($this->request->post['sseo_module'])) {
@@ -99,9 +81,11 @@ class ControllerModuleSuperSeo extends Controller {
 			if (isset($qr[1]) ) $qr = $qr[1];
 			else $qr = $qr[0];
 			$url = '&id='.$row['url_alias_id'];
-			$url = $this->url->link('module/super_seo/delete', 'token=' . $this->session->data['token'] . $url, 'SSL');
+			$url = $this->url->link('extension/module/super_seo/delete', 'user_token=' . $this->session->data['user_token'] . $url, 'SSL');
 			array_push($data['super_seo_urls'],array('query' => $qr, 'keyword' => $row['keyword'], 'delete' => $url ) );
 		}
+
+		
 		
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 			$this->model_setting_setting->editSetting('sseo', $this->request->post);		
@@ -110,35 +94,30 @@ class ControllerModuleSuperSeo extends Controller {
 			$description_route = 'route='.trim($this->request->post['route']);
 			$description_url = trim($this->request->post['url']);	
 			$this->db->query("INSERT INTO ". DB_PREFIX ."url_alias SET query = '". $this->db->escape($description_route) ."', keyword = '". $this->db->escape($description_url) ."'");
-	        $this->response->redirect($this->url->link('module/super_seo', 'token=' . $this->session->data['token'] , 'SSL'));
+	        $this->response->redirect($this->url->link('extension/module/super_seo', 'user_token=' . $this->session->data['user_token'] , 'SSL'));
 
 		}
-		
-		$this->load->model('design/layout');
-		$this->load->model('design/banner');
-		
-		$data['layouts'] = $this->model_design_layout->getLayouts();
-		$data['banners'] = $this->model_design_banner->getBanners();
-		$data['token'] = $this->session->data['token'];
+
+		$data['user_token'] = $this->session->data['user_token'];
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('module/super_seo.tpl', $data));
+		$this->response->setOutput($this->load->view('extension/module/super_seo', $data));
 
 	}
 
 	public function delete() {
-	$this->load->language('module/super_seo');
-		if (!$this->user->hasPermission('modify', 'module/super_seo')) {
+	$this->load->language('extension/module/super_seo');
+		if (!$this->user->hasPermission('modify', 'extension/module/super_seo')) {
 			$this->session->data['error'] = $this->language->get('sseo_no_permission');
-		$this->response->redirect($this->url->link('module/super_seo', 'token=' . $this->session->data['token'], 'SSL'));
+		$this->response->redirect($this->url->link('extension/module/super_seo', 'user_token=' . $this->session->data['user_token'], 'SSL'));
 		}	
 		$id = $this->request->get['id'];
 		$query = $this->db->query("DELETE FROM ". DB_PREFIX ."url_alias WHERE url_alias_id = '". (int)$id ."'");
 		if ($query)
 			$this->session->data['success'] = $this->language->get('sseo_success_delete');
-		$this->response->redirect($this->url->link('module/super_seo', 'token=' . $this->session->data['token'], 'SSL'));
+		$this->response->redirect($this->url->link('extension/module/super_seo', 'user_token=' . $this->session->data['user_token'], 'SSL'));
 
 	}
 
@@ -150,7 +129,7 @@ class ControllerModuleSuperSeo extends Controller {
 			$description_url = trim($this->request->post['url']);
 		else $description_url = null;
 
-		if (!$this->user->hasPermission('modify', 'module/super_seo')) {
+		if (!$this->user->hasPermission('modify', 'extension/module/super_seo')) {
 			$this->error['warning'] = $this->language->get('sseo_no_permission');
 		}
 		else if (empty($description_route) || empty($description_url) ){
@@ -175,8 +154,8 @@ class ControllerModuleSuperSeo extends Controller {
 	}
 
 	public function support_page () {
-		$this->load->language('module/super_seo');
-		if (!$this->user->hasPermission('modify', 'module/super_seo')) {
+		$this->load->language('extension/module/super_seo');
+		if (!$this->user->hasPermission('modify', 'extension/module/super_seo')) {
 			$this->session->data['error'] = $this->language->get('sseo_no_permission');
 		}
 		else {
@@ -188,7 +167,7 @@ class ControllerModuleSuperSeo extends Controller {
 				$this->db->query("UPDATE " . DB_PREFIX . "setting SET `value`='1' WHERE `key`='codeinspires'");
 			}
 		}
-			$this->response->redirect($this->url->link('module/super_seo', 'token=' . $this->session->data['token'], 'SSL'));
+			$this->response->redirect($this->url->link('extension/module/super_seo', 'user_token=' . $this->session->data['user_token'], 'SSL'));
 
 	}	
 
@@ -197,79 +176,82 @@ class ControllerModuleSuperSeo extends Controller {
 		$this->db->query("INSERT INTO ". DB_PREFIX . "setting VALUES (NULL,'". (int)$this->config->get('store_admin') ."','codeinspires','codeinspires','1','0')");
 	}
 
-////install language extension into index.php
-//public function langinstall() {
-//$this->languninstall();
-//$write_errors = array();
-//$catalog=DIR_CATALOG . 'index.php';
-//$admin=DIR_APPLICATION . 'index.php';
+// install script
+public function install_script() {
+$this->languninstall();
+$write_errors = array();
+$catalog=DIR_CATALOG . 'index.php';
+$admin=DIR_APPLICATION . 'index.php';
 
-//if(!is_writeable($catalog)) {
-//$write_errors[] = $catalog .' not writeable (Change File Permissions)';
-//}
-//if(empty($write_errors)){
-	//$search='if (!$store_query->num_rows) {';
-		//$replace='
-	//if (isset($request->get["_route_"])) { // seo_language define
-	//$seo_path = explode(\'/\',$request->get["_route_"]);
-	//foreach ($seo_path as $seo_part) {
-		//if (array_key_exists($seo_part,$languages)) {
-			//$session->data[\'language\'] = $seo_part;
-		//}
-	//}
-//}
-	//';
-	//$catalogsuccess=$this->replace($catalog,$search,$replace);
-//}
-////uninstall language extension into index.php
-//public function languninstall() {
+if(!is_writeable($catalog)) {
+$write_errors[] = $catalog .' not writeable (Change File Permissions)';
+}
+// if(empty($write_errors)){
+// 	$search='if (!$store_query->num_rows) {';
+// 		$replace='
+// 	if (isset($request->get["_route_"])) { // seo_language define
+// 	$seo_path = explode(\'/\',$request->get["_route_"]);
+// 	foreach ($seo_path as $seo_part) {
+// 		if (array_key_exists($seo_part,$languages)) {
+// 			$session->data[\'language\'] = $seo_part;
+// 		}
+// 	}
+// }
+// 	';
+// 	$catalogsuccess=$this->replace($catalog,$search,$replace);
+}
 
-//$write_errors = array();
-//$catalog=DIR_CATALOG . 'index.php';
-//$admin=DIR_APPLICATION . 'index.php';
 
-//if(!is_writeable($catalog)) {
-//$write_errors[] = $catalog .' not writeable (Change File Permissions)';
-//}
-//if(empty($write_errors)){
-	//$replace='if (!$store_query->num_rows) {';
-		//$search='
-	//if (isset($request->get["_route_"])) { // seo_language define
-	//$seo_path = explode(\'/\',$request->get["_route_"]);
-	//foreach ($seo_path as $seo_part) {
-		//if (array_key_exists($seo_part,$languages)) {
-			//$session->data[\'language\'] = $seo_part;
-		//}
-	//}
-//}
-	//';
-	//$catalogsuccess=$this->replace($catalog,$search,$replace);
-//}
+//uninstall script
+public function uninstall_script() {
 
-//if(!is_writeable($admin)) {
-//$write_errors[] =$admin . ' not writeable (Change File Permissions)';
-//}
-//if(empty($write_errors)){
-	//$replace='$config->set(\'config_language_id\', $languages[$config->get(\'config_admin_language\')][\'language_id\']);';
-	//$search='
-	//if (isset($request->get["_route_"])) { // seo_language define
-	//$seo_path = explode(\'/\',$request->get["_route_"]);
-	//foreach ($seo_path as $seo_part) {
-		//if (array_key_exists($seo_part,$languages)) {
-			//$session->data[\'language\'] = $seo_part;
-		//}
-	//}
-//}
-	//';
-	//$adminsuccess=$this->replace($admin,$search,$replace);
-//}
-//if(isset($catalogsuccess && $adminsuccess)){
-	//echo 'Super Seo Installed';
-//}
-//foreach($write_errors as $error){
-	//echo $error;
-	//}
-//}
+$write_errors = array();
+$catalog=DIR_CATALOG . 'index.php';
+$admin=DIR_APPLICATION . 'index.php';
+
+if(!is_writeable($catalog)) {
+$write_errors[] = $catalog .' not writeable (Change File Permissions)';
+}
+// if(empty($write_errors)){
+// 	$replace='if (!$store_query->num_rows) {';
+// 		$search='
+// 	if (isset($request->get["_route_"])) { // seo_language define
+// 	$seo_path = explode(\'/\',$request->get["_route_"]);
+// 	foreach ($seo_path as $seo_part) {
+// 		if (array_key_exists($seo_part,$languages)) {
+// 			$session->data[\'language\'] = $seo_part;
+// 		}
+// 	}
+// }
+// 	';
+// 	$catalogsuccess=$this->replace($catalog,$search,$replace);
+// }
+
+// if(!is_writeable($admin)) {
+// $write_errors[] =$admin . ' not writeable (Change File Permissions)';
+// }
+// if(empty($write_errors)){
+// 	$replace='$config->set(\'config_language_id\', $languages[$config->get(\'config_admin_language\')][\'language_id\']);';
+// 	$search='
+// 	if (isset($request->get["_route_"])) { // seo_language define
+// 	$seo_path = explode(\'/\',$request->get["_route_"]);
+// 	foreach ($seo_path as $seo_part) {
+// 		if (array_key_exists($seo_part,$languages)) {
+// 			$session->data[\'language\'] = $seo_part;
+// 		}
+// 	}
+// }
+// 	';
+// 	$adminsuccess=$this->replace($admin,$search,$replace);
+// }
+// if(isset($catalogsuccess && $adminsuccess)){
+// 	echo 'Super Seo Installed';
+// }
+// foreach($write_errors as $error){
+// 	echo $error;
+// 	}
+}
+
  private function replace($file,$search,$replace){
 	 
 //open file and get data
@@ -289,4 +271,3 @@ $this->db->query("DELETE FROM ". DB_PREFIX . "setting WHERE `key`='codeinspires'
 	}
 
 }
-?>

@@ -1,0 +1,64 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="float-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fas fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fas fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  <div class="container-fluid">
+ {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fas fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+     <div class="card">
+		  <div class="card-header"><i class="fas fa-pencil-alt"></i> {{ sseo_description }}</div>
+
+		   <div class="card-body">
+
+		   <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module">
+			<table class="table">
+			<thead>
+				<tr>
+				<td class="left"><strong>{{ description_route }}</strong></td>
+				<td colspan="2"><strong>{{ description_url }}</strong></td>
+				</tr>
+			</thead> 
+			<tbody>
+			<tr>
+				<td class="left"><input type ="text" name ="route" /></td>
+				<td colspan="2"><input type="text" name="url" /></td>
+				 <td class="left">
+					 <button onclick="$('#form').submit();" type="submit" form="form-user-group" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-plus"></i></button>
+				</td>
+			</tr>
+			 {% for url in super_seo_urls %}
+					<tr>
+						<td class="left">{{ url.query }}</td>
+						<td class="left">{{ url.keyword }}</td>
+						<td class="left">
+							<a href = "{{ url.keyword }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-default"><i class="fa fa-trash"></i>
+							</a>
+							</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+			</form>
+
+		   </div>
+      </div>
+
+		
+	</div><!-- end of .container-fluid  -->
+
+</div> <!-- end of #content -->
+

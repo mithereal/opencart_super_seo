@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification>
 	<id>Super Seo Multilanguage links</id>
-	<version>2.0</version>
+	<version>3.0</version>
 	<vqmver>2.5.0</vqmver>
 	<author>Mithereal</author>
-
+<!-- FIXME:: seo_url no longer exists-->
 	<file name="catalog/controller/common/seo_url.php">
 		<operation>
 		<search position="after"><![CDATA[
@@ -212,12 +212,12 @@
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[
-				if (isset($this->request->post['redirect'])) {
+				if (isset($this->request->get['redirect'])) {
 			]]></search>
 			<add><![CDATA[
 				//start of super seo
-			if (isset($this->request->post['redirect'])) {
-				$temp_redirect = $this->request->post['redirect'];
+			if (isset($this->request->get['redirect'])) {
+				$temp_redirect = $this->request->get['redirect'];
 			} else {
 				$temp_redirect = $this->url->link('common/home','','SSL');
 			}
